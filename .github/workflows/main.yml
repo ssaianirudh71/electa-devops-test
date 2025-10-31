@@ -1,0 +1,43 @@
+name: Docker-Compose CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # Job 1: Validate the Docker Compose syntax [cite: 41, 60]
+  validate:
+    name: Validate docker-compose.yml
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate Compose file
+        run: docker-compose config
+        # This command parses the file and checks for syntax errors
+
+  # Job 2: Deploy the infrastructure [cite: 43, 61]
+  deploy:
+    name: Deploy Infrastructure
+    needs: validate # Only run if validation passes
+    runs-on: self-hosted # <<< CRITICAL: Must run on your own machine/server
+    
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Deploy Docker Compose services
+        env:
+          # These secrets must be set in your GitHub Repo Settings
+          # Settings > Secrets and variables > Actions > New repository secret
+          VM1_NAME: ${{ secrets.VM1_NAME }}
+          VM2_NAME: ${{ secrets.VM2_NAME }}
+          ADMIN_USER: ${{ secrets.ADMIN_USER }}
+          ADMIN_PASS: ${{ secrets.ADMIN_PASS }}
+        run: docker-compose up -d
+        # '-d' runs the containers in detached mode

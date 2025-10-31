@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # Definition for the first "VM"
+  vm-test-1:
+    image: nginx:latest
+    container_name: ${VM1_NAME}
+    ports:
+      - "8081:80"
+    networks:
+      - elekta-net
+    environment:
+      - ADMIN_USER=${ADMIN_USER}
+      - ADMIN_PASS=${ADMIN_PASS}
+    restart: unless-stopped
+
+  # Definition for the second "VM"
+  vm-test-2:
+    image: nginx:latest
+    container_name: ${VM2_NAME}
+    ports:
+      - "8082:80"
+    networks:
+      - elekta-net
+    environment:
+      - ADMIN_USER=${ADMIN_USER}
+      - ADMIN_PASS=${ADMIN_PASS}
+    restart: unless-stopped
+
+networks:
+  elekta-net:
+    driver: bridge
